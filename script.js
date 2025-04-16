@@ -8,6 +8,8 @@ var result=document.getElementById("items");
 let listproduct = document.querySelector('.items');
 let listcarthtml = document.querySelector('.listcart');
 let iconcartspan= document.querySelector('.icon-cart');
+let total= document.querySelector('.totals');
+
 
 let listproducts = [];
 let carts = [];
@@ -22,6 +24,9 @@ closecart.addEventListener('click',()=>{
     body.classList.toggle('showcart')
     
 })
+
+
+
 
 const addDataToHTML = () => { 
 listproduct.innerHTML = '';
@@ -41,6 +46,8 @@ listproducts.forEach(product => {
     listproduct.appendChild(itemDiv);
 });
 }
+
+
 };
 
 
@@ -78,44 +85,52 @@ localStorage.setItem('cart', JSON.stringify(carts));
 };
 
 const addCarthtml = () => {
-listcarthtml.innerHTML = '';
-let totalquantity = 0;
+    listcarthtml.innerHTML = '';
+    let totalquantity = 0;
+    let totalprice = 0;
 
-if (carts.length > 0) {
-carts.forEach(cart => {
-    totalquantity += cart.quantity;
+    if (carts.length > 0) {
+        carts.forEach(cart => {
+            totalquantity += cart.quantity;
 
-    let newCart = document.createElement('div');
-    newCart.classList.add('item');
-    newCart.dataset.id = cart.product_id;
+            let newCart = document.createElement('div');
+            newCart.classList.add('item');
+            newCart.dataset.id = cart.product_id;
 
-    let positionproduct = listproducts.findIndex(value => value.id == cart.product_id);
-    let info = listproducts[positionproduct];
+            let positionproduct = listproducts.findIndex(value => value.id == cart.product_id);
+            let info = listproducts[positionproduct];
 
-    newCart.innerHTML = `
-        <div class="image">
-            <img src="${info.img}" alt="">
-        </div>
-        <div class="name">
-            ${info.ttl}
-        </div>
-        <div class="totalprice">
-            $${info.price * cart.quantity}
-        </div>
-        <div class="quantity">    
-         <span class="minu">-</span>
-         <span>${cart.quantity}</span>
-         <span class="plus">+</span>
-        
-        </div>
-    `;
+            // Add to total price
+            totalprice += info.price * cart.quantity;
 
-    listcarthtml.appendChild(newCart);
-});
-}
+            newCart.innerHTML = `
+                <div class="image">
+                    <img src="${info.img}" alt="">
+                </div>
+                <div class="name">
+                    ${info.ttl}
+                </div>
+                <div class="totalprice">
+                    $${info.price * cart.quantity}
+                </div>
+                <div class="quantity">    
+                    <span class="minu">-</span>
+                    <span>${cart.quantity}</span>
+                    <span class="plus">+</span>
+                </div>
+            `;
+            listcarthtml.appendChild(newCart);
+        });
+    }
 
-iconcartspan.innerText = totalquantity;
+    // Update cart icon with total items
+    iconcartspan.innerText = totalquantity;
+
+    // Update total price section
+    total.innerHTML = `<span>Total Price: $${totalprice.toFixed(2)}</span>`;
 };
+
+
 
 listcarthtml.addEventListener('click', (event) => {
 let positionclick = event.target;
